@@ -1,54 +1,43 @@
 import { StatusBar } from 'expo-status-bar';
+import { useState } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image } from 'react-native';
+import { TextInput } from 'react-native-web';
 
 export default function App() {
-
-  const DATA = [
-    {
-      id: '1', titulo: 'Java', subtitulo: 'Básico de Java', imagem:
-        'https://placehold.co/100x100', descricao: 'Curso introdutório de Java.'
-    },
-    {
-      id: '2', titulo: 'HTML e CSS', subtitulo: 'HTML 5 e suas novidades',
-      imagem: 'https://placehold.co/100x100', descricao: 'Curso sobre HTML5 e CSS.'
-    },
-    {
-      id: '3', titulo: 'Android', subtitulo: 'Boas práticas', imagem:
-        'https://placehold.co/100x100', descricao: 'Curso sobre desenvolvimento Android.'
-    },
-    {
-      id: '4', titulo: 'C#', subtitulo: 'c# legal', imagem:
-        'https://placehold.co/100x100', descricao: 'Curso de C#'
-    },
-    {
-      id: '5', titulo: 'Arduino', subtitulo: 'Arduino bom', imagem:
-        'https://placehold.co/100x100', descricao: 'Curso de Arduino'
-    },
-    {
-      id: '6', titulo: 'React Native', subtitulo: 'Desbravando conteúdo',
-      imagem: 'https://placehold.co/100x100', descricao: 'Curso de React Native.'
-    },
-  ];
-
+  const [distancia, setDistancia] = useState('');
+  const [tempo, setTempo] = useState('');
+  const [velocidadesMedias, setVelocidadesMedias] = useState([]);
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.itemContainer} onPress={() =>
-      handlePress(item)}>
-      <Image source={{ uri: item.imagem }} style={styles.image} />
-      <View style={styles.textContainer}>
-        <Text style={styles.title}>{item.titulo}</Text>
-        <Text style={styles.subtitle}>{item.subtitulo}</Text>
-      </View>
-    </TouchableOpacity>
+    <View>
+      <Text>Distância: {item.distancia}</Text>
+      <Text>Tempo: {item.tempo}</Text>
+      <Text>Velocidade média: {item.velocidadeMedia}</Text>
+    </View>
   );
+  
+
+  const add = () => {
+    const d = parseFloat(distancia);
+    const t = parseFloat(tempo);
+
+    setVelocidadesMedias([...velocidadesMedias, {distancia: d, tempo: t, velocidadeMedia: d/t, id: Date.now().toString()}]);
+    setDistancia('');
+    setTempo('');
+  }
 
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Cursos do Prof Mário</Text>
+      <TextInput keyboardType='numeric' value={distancia} onChangeText={(text) => setDistancia(text)} placeholder='Digite a distância'/>
+      <TextInput keyboardType='numeric' value={tempo} onChangeText={(text) => setTempo(text)} placeholder='Digite o tempo'/>
+      <TouchableOpacity onPress={add}>
+        <Text>Calcular</Text>
+        </TouchableOpacity>  
       <FlatList
-        data={DATA}
-        keyExtractor={(item) => item.id}
+        data={velocidadesMedias}
+        keyExtractor={(velocidadeMedia) => velocidadeMedia.id}
         renderItem={renderItem}
       />
     </View>
