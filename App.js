@@ -4,126 +4,160 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image } from 'react
 import { SectionList, TextInput } from 'react-native-web';
 
 export default function App() {
-  const [forcas, setForcas] = useState([]);
-  const [massa, setMassa] = useState('');
-  const [aceleracao, setAceleracao] = useState('');
+
+  const [contatos, setContatos] = useState(
+    [
+      {nome: "Thiago Silva", telefone: 11983927392, id: 1, mensagens: [{id: 1, mensagem: "Oi"}, {id: 2, mensagem: "Beleza"}]},
+      {nome: "Thiago Silva", telefone: 11983927392, id: 2, mensagens: [{id: 1, mensagem: "Olá"}, {id: 2, mensagem: "Tbm"}]},
+      {nome: "Thiago Silva", telefone: 11983927392, id: 3, mensagens: [{id: 1, mensagem: "Bom dia"}, {id: 2, mensagem: "Tranquilo"}]},
+      {nome: "Thiago Silva", telefone: 11983927392, id: 4, mensagens: [{id: 1, mensagem: "Boa noite"}, {id: 2, mensagem: "Tudo bem?"}]},
+      {nome: "Thiago Silva", telefone: 11983927392, id: 5, mensagens: [{id: 1, mensagem: "Beleza"}, {id: 2, mensagem: "Tudo azul?"}]},
+      {nome: "Thiago Silva", telefone: 11983927392, id: 6, mensagens: [{id: 1, mensagem: "Boa tarde"}, {id: 2, mensagem: "Beleza"}]}
+    ]
+  );
+
+  const [mensagens, setMensagens] = useState([]);
+  const [mensagem, setMensagem] = useState("");
+  const [currentContact, setCurrentContact] = useState("");
+
 
   const renderItem = ({ item }) => (
-    <View style={styles.item}>
-      <Text style={styles.textButton}>Massa: {item.massa}</Text>
-      <Text style={styles.textButton}>Aceleração: {item.aceleracao}</Text>
-      <Text style={styles.textButton}>Força: {item.forca}</Text>
+    <TouchableOpacity style={styles.contato} onPress={() => abrir(item.id)}>
+      <Text style={styles.primeiraLetra}>{item.nome.charAt(0)}</Text>
+      <Text style={styles.nome}>{item.nome}</Text>
+    </TouchableOpacity>
+  );
+
+  const mensagemItem = ({ item }) => (
+    <View style={styles.mensagem}>
+      <Text style={styles.textMensagem}>{item.mensagem}</Text>
     </View>
   );
 
-  const sectionHeader = ({ section: { title } }) => (
-    <Text style={{backgroundColor: '#3F51B5',
-      color: '#fff',
-      fontSize: 20,
-      textAlign: 'center',
-      padding: 10,
-      fontWeight: 'bold', marginTop: 20}}>{title}</Text>
-  );
-
-
-  const add = () => {
-    if (massa != "" && !isNaN(massa) && aceleracao != "" && !isNaN(aceleracao)) {
-      const m = parseFloat(massa);
-      const a = parseFloat(aceleracao);
-      const f = m * a;
-      let categoria = "";
-      if (f <= 10) {
-        categoria = "Leve";
-      } else if (f > 10 && f <= 50) {
-        categoria = "Médio";
-      } else {
-        categoria = "Pesado";
-      }
-
-      const index = forcas.findIndex(forca => forca.title === categoria);
-
-      if (index !== -1) {
-        const novaLista = [...forcas];
-        const novaSessao = {...novaLista[index]};
-        novaSessao.data = [...novaSessao.data, { aceleracao: a, massa: m, forca: f, id: Date.now().toString() }];
-        novaLista[index] = novaSessao;
-        setForcas(novaLista);
-      } else {
-        setForcas([...forcas, {
-          title: categoria,
-          data: [{ aceleracao: a, massa: m, forca: f, id: Date.now().toString() }]
-        }]);
-      }
-      
-    }
+  const abrir = (id) => {
+    const contato = contatos.find(c => c.id === id);
+    setCurrentContact(contato);
+    setMensagens(contato.mensagens);
   }
 
+  const enviarMensagem = () => {
+    const novaMensagem = {id: Date.now().toString(), mensagem: mensagem};
+    const index = contatos.findIndex(c => c.id === currentContact.id);
+    const novaLista = [...contatos[index].mensagens, novaMensagem];
+    const novoContato = {...currentContact, mensagens: novaLista};
+    const novaListaC = [...contatos];
+    novaListaC[index].mensagens = novaLista;
+    setContatos(novaListaC)
+    setCurrentContact(novoContato);
+    setMensagens(novaLista);
+    setMensagem("");
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Cálculo da força</Text>
-      <View style={{ display: "flex", gap: 10, alignItems: "flex-end", paddingInline: 20 }}>
-        <TextInput style={styles.input} keyboardType='numeric' value={massa} onChangeText={(text) => setMassa(text)} placeholder='Digite a massa' />
-        <TextInput style={styles.input} keyboardType='numeric' value={aceleracao} onChangeText={(text) => setAceleracao(text)} placeholder='Digite a aceleração' />
-        <View style={{ display: "flex", flexDirection: "row", gap: 10 }}>
-          <TouchableOpacity style={styles.button} onPress={() => setForcas([])}>
-            <Text style={styles.textButton}>Limpar</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={add}>
-            <Text style={styles.textButton}>Calcular</Text>
-          </TouchableOpacity>
+      <FlatList style={styles.list}
+      data={contatos}
+      keyExtractor={(item) => item.id}
+      renderItem={renderItem}
+      />
+      <View style={styles.constainer2}>
+        <FlatList style={styles.listMensagens}
+        data={mensagens}
+        keyExtractor={(item) => item.id}
+        renderItem={mensagemItem}
+        />
+        <View style={styles.containerInput}>
+          <TextInput placeholder='Digite algo' style={styles.input} value={mensagem} onChangeText={(text) => setMensagem(text)}/>
+          <TouchableOpacity style={styles.button} onPress={enviarMensagem}>Enviar</TouchableOpacity>
         </View>
       </View>
-      <SectionList
-        style={{ paddingInline: 20 , display: "flex", gap: 20}}
-        sections={forcas}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        renderSectionHeader={sectionHeader}
-      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-    gap: 20
+    display: "flex",
+    width: "100%",
+    backgroundColor: "#292929",
+    flexDirection: "row"
+  }, 
+  list: {
+    display: "flex",
+    flexDirection: "column",
+    width: "30%",
+    scrollbarWidth: "none", 
+  msOverflowStyle: "none", 
+  }, 
+  contato: {
+    width: "100%", 
+    padding: 10,
+    display: 'flex', 
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between", 
+    backgroundColor: "#4f4f4f",
+    borderBottomWidth: 2,
+    borderBottomColor: "#292929"
+  }, 
+  primeiraLetra: {
+    height: 50, 
+    width: 50,
+    backgroundColor: "#0f0",
+    borderRadius: 30,
+    display: 'flex',
+    justifyContent: "center",
+    alignItems: "center",
+    color: "#fff", 
+    fontSize: "1.5rem"
+  }, 
+  nome: {
+    fontSize: '1.2rem', 
+    color: "#fff"
+  }, 
+  constainer2: {
+    width: "70%",
+    display: "flex", 
+    flexDirection: "column", 
+    alignItems: "flex-start", 
+    justifyContent: "space-between"
+  }, 
+  containerInput: {
+    width: "100%",
+    display: "flex", 
+    flexDirection: "row", 
+    alignItems: "center", 
+    justifyContent: "space-between",
+    padding: 10,
+  }, 
+  mensagem: {
+    backgroundColor: "#4f4f4f", 
+    padding: 20, 
+    borderRadius: 10, 
+    marginBottom: 10
   },
+  textMensagem: {
+    color: "#fff"
+  }, 
+  listMensagens: {
+    display: "flex",
+    padding: 20
+  }, 
   input: {
     padding: 10,
-    borderWidth: 2,
-    borderColor: "#000",
-    borderRadius: 10,
-    width: "100%"
-  },
-  header: {
-    backgroundColor: '#3F51B5',
-    color: '#fff',
-    fontSize: 20,
-    textAlign: 'center',
-    padding: 10,
-    fontWeight: 'bold',
-  },
+    backgroundColor: "#4f4f4f",
+    color: "#fff", 
+    border: "none", 
+    outlineStyle: "none", 
+    borderRadius: 10, 
+    width: "90%"
+  }, 
   button: {
+    width: 70, 
     padding: 10,
-    backgroundColor: "#3F51B5",
-    width: 200,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    color: "#fff", 
+    backgroundColor: "#0f0",
+    fontSize: "1rem", 
     borderRadius: 10
-  },
-  textButton: {
-    color: "#fff"
-  },
-  item: {
-    display: "flex",
-    alignItems: "flex-start",
-    padding: 20,
-    backgroundColor: "#5A33E0",
-    borderRadius: 20,
-    marginTop: 20
   }
 });
