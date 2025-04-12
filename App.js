@@ -16,7 +16,6 @@ export default function App() {
     ]
   );
 
-  const [mensagens, setMensagens] = useState([]);
   const [mensagem, setMensagem] = useState("");
   const [currentContact, setCurrentContact] = useState("");
 
@@ -37,20 +36,20 @@ export default function App() {
   const abrir = (id) => {
     const contato = contatos.find(c => c.id === id);
     setCurrentContact(contato);
-    setMensagens(contato.mensagens);
   }
 
   const enviarMensagem = () => {
-    const novaMensagem = {id: Date.now().toString(), mensagem: mensagem};
+    if(mensagem.trim() !== ""){
+      const novaMensagem = {id: Date.now().toString(), mensagem: mensagem};
     const index = contatos.findIndex(c => c.id === currentContact.id);
     const novaLista = [...contatos[index].mensagens, novaMensagem];
     const novoContato = {...currentContact, mensagens: novaLista};
-    const novaListaC = [...contatos];
-    novaListaC[index].mensagens = novaLista;
-    setContatos(novaListaC)
+    const novaListaContatos = [...contatos];
+    novaListaContatos[index].mensagens = novaLista;
+    setContatos(novaListaContatos)
     setCurrentContact(novoContato);
-    setMensagens(novaLista);
     setMensagem("");
+    }
   }
 
   return (
@@ -62,13 +61,15 @@ export default function App() {
       />
       <View style={styles.constainer2}>
         <FlatList style={styles.listMensagens}
-        data={mensagens}
+        data={currentContact.mensagens}
         keyExtractor={(item) => item.id}
         renderItem={mensagemItem}
         />
         <View style={styles.containerInput}>
           <TextInput placeholder='Digite algo' style={styles.input} value={mensagem} onChangeText={(text) => setMensagem(text)}/>
-          <TouchableOpacity style={styles.button} onPress={enviarMensagem}>Enviar</TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={enviarMensagem}>
+            <Image style={styles.img} source={require("./icon_enviar.png")}/>
+            </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
   list: {
     display: "flex",
     flexDirection: "column",
-    width: "30%",
+    width: "35%",
     scrollbarWidth: "none", 
   msOverflowStyle: "none", 
   }, 
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
     color: "#fff"
   }, 
   constainer2: {
-    width: "70%",
+    width: "65%",
     display: "flex", 
     flexDirection: "column", 
     alignItems: "flex-start", 
@@ -134,14 +135,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#4f4f4f", 
     padding: 20, 
     borderRadius: 10, 
-    marginBottom: 10
+    marginBottom: 10, 
+    alignSelf: "flex-start",
+    display: "flex", 
+    maxWidth: "100%"
   },
   textMensagem: {
-    color: "#fff"
+    color: "#fff",
+    flexWrap: "wrap"
   }, 
   listMensagens: {
     display: "flex",
-    padding: 20
+    padding: 20, 
+    width: "100%"
   }, 
   input: {
     padding: 10,
@@ -158,6 +164,13 @@ const styles = StyleSheet.create({
     color: "#fff", 
     backgroundColor: "#0f0",
     fontSize: "1rem", 
-    borderRadius: 10
+    borderRadius: 10, 
+    display: "flex", 
+    alignItems: "center",
+    justifyContent: "center"
+  }, 
+  img: {
+    width: 20, 
+    height: 20
   }
 });
