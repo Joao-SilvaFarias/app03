@@ -1,44 +1,85 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image } from 'react-native';
-import { TextInput } from 'react-native-web';
+import { SectionList, TextInput } from 'react-native-web';
 
 export default function App() {
-  const [distancia, setDistancia] = useState('');
-  const [tempo, setTempo] = useState('');
-  const [velocidadesMedias, setVelocidadesMedias] = useState([]);
+  const [forcas, setForcas] = useState([]);
+  const [massa, setMassa] = useState('');
+  const [aceleracao, setAceleracao] = useState('');
 
   const renderItem = ({ item }) => (
-    <View>
-      <Text>Distância: {item.distancia}</Text>
-      <Text>Tempo: {item.tempo}</Text>
-      <Text>Velocidade média: {item.velocidadeMedia}</Text>
+    <View style={styles.item}>
+      <Text style={styles.textButton}>Massa: {item.massa}</Text>
+      <Text style={styles.textButton}>Aceleração: {item.aceleracao}</Text>
+      <Text style={styles.textButton}>Força: {item.forca}</Text>
     </View>
   );
-  
+
+  const sectionHeader = ({ section: { title } }) => (
+    <Text style={{backgroundColor: '#3F51B5',
+      color: '#fff',
+      fontSize: 20,
+      textAlign: 'center',
+      padding: 10,
+      fontWeight: 'bold', marginTop: 20}}>{title}</Text>
+  );
+
 
   const add = () => {
-    const d = parseFloat(distancia);
-    const t = parseFloat(tempo);
+    if (massa != "" && !isNaN(massa) && aceleracao != "" && !isNaN(aceleracao)) {
+      const m = parseFloat(massa);
+      const a = parseFloat(aceleracao);
+      const f = m * a;
+      let categoria = "";
+      if (f <= 10) {
+        categoria = "Leve";
+      } else if (f > 10 && f <= 50) {
+        categoria = "Médio";
+      } else {
+        categoria = "Pesado";
+      }
 
-    setVelocidadesMedias([...velocidadesMedias, {distancia: d, tempo: t, velocidadeMedia: d/t, id: Date.now().toString()}]);
-    setDistancia('');
-    setTempo('');
+      const index = forcas.findIndex(forca => forca.title === categoria);
+
+      if (index !== -1) {
+        const novaLista = [...forcas];
+        const novaSessao = {...novaLista[index]};
+        novaSessao.data = [...novaSessao.data, { aceleracao: a, massa: m, forca: f, id: Date.now().toString() }];
+        novaLista[index] = novaSessao;
+        setForcas(novaLista);
+      } else {
+        setForcas([...forcas, {
+          title: categoria,
+          data: [{ aceleracao: a, massa: m, forca: f, id: Date.now().toString() }]
+        }]);
+      }
+      
+    }
   }
 
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Cursos do Prof Mário</Text>
-      <TextInput keyboardType='numeric' value={distancia} onChangeText={(text) => setDistancia(text)} placeholder='Digite a distância'/>
-      <TextInput keyboardType='numeric' value={tempo} onChangeText={(text) => setTempo(text)} placeholder='Digite o tempo'/>
-      <TouchableOpacity onPress={add}>
-        <Text>Calcular</Text>
-        </TouchableOpacity>  
-      <FlatList
-        data={velocidadesMedias}
-        keyExtractor={(velocidadeMedia) => velocidadeMedia.id}
+      <Text style={styles.header}>Cálculo da força</Text>
+      <View style={{ display: "flex", gap: 10, alignItems: "flex-end", paddingInline: 20 }}>
+        <TextInput style={styles.input} keyboardType='numeric' value={massa} onChangeText={(text) => setMassa(text)} placeholder='Digite a massa' />
+        <TextInput style={styles.input} keyboardType='numeric' value={aceleracao} onChangeText={(text) => setAceleracao(text)} placeholder='Digite a aceleração' />
+        <View style={{ display: "flex", flexDirection: "row", gap: 10 }}>
+          <TouchableOpacity style={styles.button} onPress={() => setForcas([])}>
+            <Text style={styles.textButton}>Limpar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={add}>
+            <Text style={styles.textButton}>Calcular</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <SectionList
+        style={{ paddingInline: 20 , display: "flex", gap: 20}}
+        sections={forcas}
+        keyExtractor={(item) => item.id}
         renderItem={renderItem}
+        renderSectionHeader={sectionHeader}
       />
     </View>
   );
@@ -46,39 +87,43 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
-  flex: 1,
-  backgroundColor: '#f5f5f5',
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+    gap: 20
+  },
+  input: {
+    padding: 10,
+    borderWidth: 2,
+    borderColor: "#000",
+    borderRadius: 10,
+    width: "100%"
   },
   header: {
-  backgroundColor: '#3F51B5',
-  color: '#fff',
-  fontSize: 20,
-  textAlign: 'center',
-  padding: 10,
-  fontWeight: 'bold',
+    backgroundColor: '#3F51B5',
+    color: '#fff',
+    fontSize: 20,
+    textAlign: 'center',
+    padding: 10,
+    fontWeight: 'bold',
   },
-  itemContainer: {
-  flexDirection: 'row',
-  padding: 10,
-  borderBottomWidth: 1,
-  borderBottomColor: '#ccc',
-  backgroundColor: '#fff',
+  button: {
+    padding: 10,
+    backgroundColor: "#3F51B5",
+    width: 200,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10
   },
-  image: {
-  width: 50,
-  height: 50,
-  marginRight: 10,
+  textButton: {
+    color: "#fff"
   },
-  textContainer: {
-  justifyContent: 'center',
-  },
-  title: {
-  fontSize: 18,
-  fontWeight: 'bold',
-  color: '#333',
-  },
-  subtitle: {
-  fontSize: 14,
-  color: '#666',
-  },
-  });
+  item: {
+    display: "flex",
+    alignItems: "flex-start",
+    padding: 20,
+    backgroundColor: "#5A33E0",
+    borderRadius: 20,
+    marginTop: 20
+  }
+});
