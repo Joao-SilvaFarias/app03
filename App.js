@@ -1,7 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState, useRef } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image } from 'react-native';
-import { SectionList, TextInput } from 'react-native-web';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image, TextInput } from 'react-native';
 
 export default function App() {
 
@@ -34,7 +33,9 @@ export default function App() {
 
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.contato} onPress={() => abrir(item.id)} onLongPress={() => exibirAlerta(item.id)}>
-      <Text style={styles.primeiraLetra}>{item.nome.charAt(0)}</Text>
+      <View style={styles.primeiraLetra}>
+        <Text style={styles.txtPrimeiraLetra}>{item.nome.charAt(0)}</Text>
+      </View>
       <Text style={styles.nome}>{item.nome}</Text>
     </TouchableOpacity>
   );
@@ -91,32 +92,42 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <FlatList style={styles.list}
-        data={contatos}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-      />
-      <View style={styles.constainer2}>
+      {!currentContact &&
+        <FlatList style={styles.list}
+          data={contatos}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+        />
+      }
       {currentContact &&
+        <View style={styles.constainer2}>
           <View style={styles.header}>
-            <Text style={styles.primeiraLetra}>{currentContact.nome.charAt(0)}</Text>
+            <View style={styles.divVoltar}>
+            <TouchableOpacity onPress={() => setCurrentContact("")}>
+              <Image source={require("./icon_back.png")} style={styles.imgBack}/>
+            </TouchableOpacity>
+            <View style={styles.primeiraLetra}>
+              <Text style={styles.txtPrimeiraLetra}>{currentContact.nome.charAt(0)}</Text>
+            </View>
+            </View>
             <Text style={styles.nome}>{currentContact.nome}</Text>
           </View>
-        }
-        <FlatList style={styles.listMensagens}
-          data={currentContact.mensagens}
-          keyExtractor={(item) => item.id}
-          renderItem={mensagemItem}
-        />
-        {currentContact &&
-          <View style={styles.containerInput}>
-            <TextInput placeholder='Digite algo' style={styles.input} value={mensagem} onChangeText={(text) => setMensagem(text)} />
-            <TouchableOpacity style={styles.button} onPress={enviarMensagem}>
-              <Image style={styles.img} source={require("./icon_enviar.png")} />
-            </TouchableOpacity>
-          </View>
-        }
-      </View>
+
+          <FlatList style={styles.listMensagens}
+            data={currentContact.mensagens}
+            keyExtractor={(item) => item.id}
+            renderItem={mensagemItem}
+          />
+          {currentContact &&
+            <View style={styles.containerInput}>
+              <TextInput placeholder='Digite algo' style={styles.input} value={mensagem} onChangeText={(text) => setMensagem(text)} />
+              <TouchableOpacity style={styles.btnEnviar} onPress={enviarMensagem}>
+                <Image style={styles.img} source={require("./icon_enviar.png")} />
+              </TouchableOpacity>
+            </View>
+          }
+        </View>
+      }
       {alerta && (
         <View style={styles.alerta}>
           <View>
@@ -154,10 +165,13 @@ export default function App() {
             >
               <Text style={styles.textMensagem}>Adicionar</Text>
             </TouchableOpacity>
-        </View>
+          </View>
         </View>
       )}
-      <TouchableOpacity style={styles.btnAdd} onPress={() => setAdd(true)}>+</TouchableOpacity>
+      {!currentContact && 
+      <TouchableOpacity style={styles.btnAdd} onPress={() => setAdd(true)}>
+      <Text style={styles.txtBtnAdd}>+</Text>
+    </TouchableOpacity>}
     </View>
   );
 }
@@ -166,13 +180,14 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     width: "100%",
+    height: "100%",
     backgroundColor: "#292929",
     flexDirection: "row"
   },
   list: {
     display: "flex",
     flexDirection: "column",
-    width: "40%",
+    width: "100%",
     scrollbarWidth: "none",
     msOverflowStyle: "none",
     borderRightWidth: 3,
@@ -197,15 +212,19 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: "center",
     alignItems: "center",
+    textAlign: "center"
+  },
+  txtPrimeiraLetra: {
     color: "#fff",
-    fontSize: "1.5rem"
+    fontSize: 28
   },
   nome: {
-    fontSize: '1.2rem',
+    fontSize: 20,
     color: "#fff"
   },
   constainer2: {
-    width: "60%",
+    width: "100%",
+    height:"100%",
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-start",
@@ -240,13 +259,14 @@ const styles = StyleSheet.create({
     msOverflowStyle: "none",
   },
   input: {
+    height: 60,
     padding: 10,
     backgroundColor: "#4f4f4f",
     color: "#fff",
     border: "none",
     outlineStyle: "none",
     borderRadius: 10,
-    width: "90%"
+    width: "85%"
   },
   input2: {
     padding: 10,
@@ -259,11 +279,10 @@ const styles = StyleSheet.create({
     borderColor: "#3f3f3f"
   },
   button: {
-    width: 70,
-    padding: 10,
+    padding: 20,
     color: "#fff",
     backgroundColor: "#0f0",
-    fontSize: "1rem",
+    fontSize: 17,
     borderRadius: 10,
     display: "flex",
     alignItems: "center",
@@ -301,7 +320,7 @@ const styles = StyleSheet.create({
     width: 400,
     height: 200,
     padding: 20,
-    borderWidth: 1, 
+    borderWidth: 1,
     borderColor: "#343434",
     backgroundColor: "#4f4f4f",
     borderRadius: 10,
@@ -311,34 +330,58 @@ const styles = StyleSheet.create({
     transform: "translate(-50%, -50%)",
     display: "flex",
     alignItems: "flex-end",
-    justifyContent: "space-around", 
+    justifyContent: "space-around",
 
   },
   btnAdd: {
-    height: 50,
-    width: 50,
+    height: 70,
+    width: 70,
     borderRadius: 10,
     backgroundColor: "#4f4f4f",
     outlineStyle: "none",
-    left: "5px",
-    bottom: "5px",
+    left: 5,
+    bottom: 5,
     position: "absolute",
     display: "flex",
     alignItems: "center",
-    justifyContent: "center", 
-    color: "#fff", 
-    fontSize: "2rem",
-    borderWidth: 1, 
+    justifyContent: "center",
+    borderWidth: 1,
     borderColor: "#343434",
     fontWeight: "900"
-  }, 
+  },
+  txtBtnAdd: {
+    color: "#fff",
+    fontSize: 28
+  },
   header: {
-    width: "100%", 
-    padding: 20, 
-    display: "flex", 
-    flexDirection: "row", 
-    alignItems: "center", 
-    justifyContent: "space-between", 
-    backgroundColor: "#4f4f4f" 
+    width: "100%",
+    padding: 20,
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#4f4f4f"
+  }, 
+  divVoltar: {
+  display: "flex",
+  flexDirection: "row", 
+  width: 100, 
+  justifyContent: "space-between",
+  alignItems: "center"
+  }, 
+  imgBack: {
+    height: 30, 
+    width: 30
+  }, 
+  btnEnviar: {
+    width: 60, 
+    height: 60, 
+    color: "#fff",
+    backgroundColor: "#0f0",
+    fontSize: 17,
+    borderRadius: 10,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
   }
 });
