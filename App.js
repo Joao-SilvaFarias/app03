@@ -12,13 +12,13 @@ export default function App() {
       { nome: "Maria de Lurdes", telefone: 11983927256, id: 3, mensagens: [{ id: 1, mensagem: "Bom dia" }, { id: 2, mensagem: "Tranquilo" }] },
       { nome: "Neymar", telefone: 11983927742, id: 4, mensagens: [{ id: 1, mensagem: "Boa noite" }, { id: 2, mensagem: "Tudo bem?" }] },
       { nome: "Sandro Rezende", telefone: 11947227392, id: 5, mensagens: [{ id: 1, mensagem: "Beleza" }, { id: 2, mensagem: "Tudo azul?" }] },
-      { nome: "Augusto Pereira", telefone: 11983927392, id: 6, mensagens: [{ id: 1, mensagem: "Boa tarde" }, { id: 2, mensagem: "Beleza" }] }, 
+      { nome: "Augusto Pereira", telefone: 11983927392, id: 6, mensagens: [{ id: 1, mensagem: "Boa tarde" }, { id: 2, mensagem: "Beleza" }] },
       { nome: "Felipe Luis", telefone: 11983927777, id: 7, mensagens: [{ id: 1, mensagem: "Oi" }, { id: 2, mensagem: "Beleza" }] },
       { nome: "Vinicius", telefone: 11983927426, id: 8, mensagens: [{ id: 1, mensagem: "Olá" }, { id: 2, mensagem: "Tbm" }] },
       { nome: "Maria de Lurdes", telefone: 11983927256, id: 9, mensagens: [{ id: 1, mensagem: "Bom dia" }, { id: 2, mensagem: "Tranquilo" }] },
       { nome: "Neymar", telefone: 11983927742, id: 10, mensagens: [{ id: 1, mensagem: "Boa noite" }, { id: 2, mensagem: "Tudo bem?" }] },
       { nome: "Sandro Rezende", telefone: 11947227392, id: 11, mensagens: [{ id: 1, mensagem: "Beleza" }, { id: 2, mensagem: "Tudo azul?" }] },
-      { nome: "Augusto Pereira", telefone: 11983927392, id: 12, mensagens: [{ id: 1, mensagem: "Boa tarde" }, { id: 2, mensagem: "Beleza" }] }, 
+      { nome: "Augusto Pereira", telefone: 11983927392, id: 12, mensagens: [{ id: 1, mensagem: "Boa tarde" }, { id: 2, mensagem: "Beleza" }] },
       { nome: "Felipe Luis", telefone: 11983927777, id: 13, mensagens: [{ id: 1, mensagem: "Oi" }, { id: 2, mensagem: "Beleza" }] },
       { nome: "Vinicius", telefone: 11983927426, id: 14, mensagens: [{ id: 1, mensagem: "Olá" }, { id: 2, mensagem: "Tbm" }] },
       { nome: "Maria de Lurdes", telefone: 11983927256, id: 15, mensagens: [{ id: 1, mensagem: "Bom dia" }, { id: 2, mensagem: "Tranquilo" }] }
@@ -29,6 +29,8 @@ export default function App() {
   const [currentContact, setCurrentContact] = useState("");
   const [alerta, setAlerta] = useState(false);
   const [add, setAdd] = useState(false);
+  const [nome, setNome] = useState("");
+  const [telefone, setTelefone] = useState("");
 
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.contato} onPress={() => abrir(item.id)} onLongPress={() => exibirAlerta(item.id)}>
@@ -44,7 +46,7 @@ export default function App() {
   );
 
   const abrir = (id) => {
-    if(alerta === false){
+    if (alerta === false) {
       const contato = contatos.find(c => c.id === id);
       setCurrentContact(contato);
     }
@@ -77,6 +79,16 @@ export default function App() {
     }
   }
 
+  const adicionarContato = () => {
+    if (nome !== "" && telefone !== "" && telefone.length === 11 && telefone.charAt(0) == 1 && telefone.charAt(1) == 1 && telefone.charAt(2) == 9) {
+      const contato = { nome: nome, telefone: telefone, id: Date.now().toString(), mensagens: [] };
+      setContatos([...contatos, contato]);
+      setAdd(false);
+      setNome("");
+      setTelefone("");
+    }
+  }
+
   return (
     <View style={styles.container}>
       <FlatList style={styles.list}
@@ -90,13 +102,13 @@ export default function App() {
           keyExtractor={(item) => item.id}
           renderItem={mensagemItem}
         />
-        {currentContact && 
-        <View style={styles.containerInput}>
-        <TextInput placeholder='Digite algo' style={styles.input} value={mensagem} onChangeText={(text) => setMensagem(text)} />
-        <TouchableOpacity style={styles.button} onPress={enviarMensagem}>
-          <Image style={styles.img} source={require("./icon_enviar.png")} />
-        </TouchableOpacity>
-      </View>
+        {currentContact &&
+          <View style={styles.containerInput}>
+            <TextInput placeholder='Digite algo' style={styles.input} value={mensagem} onChangeText={(text) => setMensagem(text)} />
+            <TouchableOpacity style={styles.button} onPress={enviarMensagem}>
+              <Image style={styles.img} source={require("./icon_enviar.png")} />
+            </TouchableOpacity>
+          </View>
         }
       </View>
       {alerta && (
@@ -106,7 +118,7 @@ export default function App() {
           </View>
           <View>
             <Text style={styles.textMensagem}>
-              Apagar {currentContact.nome}
+              Tem certeza que deseja excluir {currentContact.nome}?
             </Text>
           </View>
           <View style={styles.buttonsAlert}>
@@ -122,6 +134,24 @@ export default function App() {
           </View>
         </View>
       )}
+      {add && (
+        <View style={styles.add}>
+          <TextInput placeholder='Nome' style={styles.input2} value={nome} onChangeText={(text) => setNome(text)} />
+          <TextInput placeholder='Telefone' style={styles.input2} value={telefone} onChangeText={(text) => setTelefone(text)} />
+          <View style={styles.buttonsAlert}>
+            <TouchableOpacity style={styles.button} onPress={() => setAdd(false)}>
+              <Text style={styles.textMensagem}>Cancelar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={adicionarContato}
+            >
+              <Text style={styles.textMensagem}>Adicionar</Text>
+            </TouchableOpacity>
+        </View>
+        </View>
+      )}
+      <TouchableOpacity style={styles.btnAdd} onPress={() => setAdd(true)}>+</TouchableOpacity>
     </View>
   );
 }
@@ -199,7 +229,7 @@ const styles = StyleSheet.create({
   listMensagens: {
     display: "flex",
     padding: 20,
-    width: "100%", 
+    width: "100%",
     scrollbarWidth: "none",
     msOverflowStyle: "none",
   },
@@ -211,6 +241,16 @@ const styles = StyleSheet.create({
     outlineStyle: "none",
     borderRadius: 10,
     width: "90%"
+  },
+  input2: {
+    padding: 10,
+    backgroundColor: "#4f4f4f",
+    color: "#fff",
+    outlineStyle: "none",
+    borderRadius: 10,
+    width: "100%",
+    borderWidth: 2,
+    borderColor: "#3f3f3f"
   },
   button: {
     width: 70,
@@ -231,8 +271,10 @@ const styles = StyleSheet.create({
     width: 400,
     height: 200,
     padding: 20,
-    backgroundColor: "#4f4f4f",
     borderRadius: 10,
+    borderColor: "#343434",
+    borderWidth: 1,
+    backgroundColor: "#4f4f4f",
     position: "absolute",
     left: "50%",
     top: "50%",
@@ -248,5 +290,40 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     gap: 10,
     width: "100%"
+  },
+  add: {
+    width: 400,
+    height: 200,
+    padding: 20,
+    borderWidth: 1, 
+    borderColor: "#343434",
+    backgroundColor: "#4f4f4f",
+    borderRadius: 10,
+    position: "absolute",
+    left: "50%",
+    top: "50%",
+    transform: "translate(-50%, -50%)",
+    display: "flex",
+    alignItems: "flex-end",
+    justifyContent: "space-around", 
+
+  },
+  btnAdd: {
+    height: 50,
+    width: 50,
+    borderRadius: 10,
+    backgroundColor: "#4f4f4f",
+    outlineStyle: "none",
+    left: "5px",
+    bottom: "5px",
+    position: "absolute",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center", 
+    color: "#fff", 
+    fontSize: "2rem",
+    borderWidth: 1, 
+    borderColor: "#343434",
+    fontWeight: "900"
   }
 });
