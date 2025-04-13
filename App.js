@@ -97,6 +97,12 @@ export default function App() {
         renderItem={renderItem}
       />
       <View style={styles.constainer2}>
+      {currentContact &&
+          <View style={styles.header}>
+            <Text style={styles.primeiraLetra}>{currentContact.nome.charAt(0)}</Text>
+            <Text style={styles.nome}>{currentContact.nome}</Text>
+          </View>
+        }
         <FlatList style={styles.listMensagens}
           data={currentContact.mensagens}
           keyExtractor={(item) => item.id}
@@ -325,5 +331,14 @@ const styles = StyleSheet.create({
     borderWidth: 1, 
     borderColor: "#343434",
     fontWeight: "900"
+  }, 
+  header: {
+    width: "100%", 
+    padding: 20, 
+    display: "flex", 
+    flexDirection: "row", 
+    alignItems: "center", 
+    justifyContent: "space-between", 
+    backgroundColor: "#4f4f4f" 
   }
 });
