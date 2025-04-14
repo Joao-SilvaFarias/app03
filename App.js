@@ -1,36 +1,41 @@
-import { StyleSheet, View, FlatList } from "react-native";
-import Pessoa from "./components/Pessoa";
+import { View, FlatList, StyleSheet } from "react-native";
 import { useState } from "react";
+import Tarefa from "./components/Tarefa";
+import ButtonMais from "./components/BtnMais";
 
-export default function App(){
+const App = () => {
 
-  const [pessoas, setPessoas] = useState([
-    {nome: "Pedro", email: "pedro@gmail.com", idade: 15, id: 1}, 
-    {nome: "Pedro", email: "pedro@gmail.com", idade: 15, id: 2}, 
-    {nome: "Pedro", email: "pedro@gmail.com", idade: 15, id: 3}, 
-    {nome: "Pedro", email: "pedro@gmail.com", idade: 15, id: 4}, 
-    {nome: "Pedro", email: "pedro@gmail.com", idade: 15, id: 5}, 
-    {nome: "Pedro", email: "pedro@gmail.com", idade: 15, id: 6}, 
-    {nome: "Pedro", email: "pedro@gmail.com", idade: 15, id: 7}, 
-    {nome: "Pedro", email: "pedro@gmail.com", idade: 15, id: 8}
+  const [tarefas, setTarefas] = useState([
+    {id: 1, titulo: "Tarefa 1"}, 
+    {id: 2, titulo: "Tarefa 2"}, 
+    {id: 3, titulo: "Tarefa 3"}, 
+    {id: 4, titulo: "Tarefa 4"}, 
+    {id: 5, titulo: "Tarefa 5"}, 
+    {id: 6, titulo: "Tarefa 6"}, 
+    {id: 7, titulo: "Tarefa 7"}
   ]);
 
   return(
     <View style={styles.container}>
-      <FlatList style={styles.container}
-      data={pessoas}
-      keyExtractor={(pessoa) => pessoa.id}
-      renderItem={({item}) => <Pessoa pessoa={item}/>}
+      <FlatList 
+      data={tarefas} 
+      keyExtractor={tarefa => tarefa.id}
+      renderItem={({item}) => <Tarefa tarefa={item}/>}
       />
+      <ButtonMais/>
     </View>
-  );
+  )
 }
+export default App;
+
 
 const styles = StyleSheet.create({
   container: {
-    display: "flex", 
+    display: "flex",
+    flexDirection: "column",
+    padding: 20,
+    backgroundColor: "#444444", 
     width: "100%", 
-    height: "100%", 
-    backgroundColor: "#fff"
+    height: "100%"
   }
-})
+});
