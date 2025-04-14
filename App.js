@@ -189,9 +189,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     width: "100%",
     scrollbarWidth: "none",
-    msOverflowStyle: "none",
-    borderRightWidth: 3,
-    borderRightColor: "#222222"
+    msOverflowStyle: "none"
   },
   contato: {
     width: "100%",
