@@ -11,8 +11,7 @@ export default function App(){
     {nome: "Pedro", email: "pedro@gmail.com", idade: 15, id: 4}, 
     {nome: "Pedro", email: "pedro@gmail.com", idade: 15, id: 5}, 
     {nome: "Pedro", email: "pedro@gmail.com", idade: 15, id: 6}, 
-    {nome: "Pedro", email: "pedro@gmail.com", idade: 15, id: 7}, 
-    {nome: "Pedro", email: "pedro@gmail.com", idade: 15, id: 8}
+    {nome: "Pedro", email: "pedro@gmail.com", idade: 15, id: 7}
   ]);
 
   return(
